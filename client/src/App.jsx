@@ -16,7 +16,7 @@ function App() {
       }
     }
     fetchTasks();
-  }, [taskList]);
+  }, []);
 
   const DeleteTask = async (id) => {
     await axios
