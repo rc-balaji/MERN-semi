@@ -13,12 +13,10 @@ router.get("/tasks", async (req, res) => {
 });
 
 router.post("/tasks", async (req, res) => {
-  const task = new Task({
-    text: req.body.text,
-  });
   try {
-    const newTask = await task.save();
-    res.json(newTask);
+    const newItem = new Task(req.body);
+    await newItem.save();
+    res.json(newItem);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -26,15 +24,10 @@ router.post("/tasks", async (req, res) => {
 
 router.put("/tasks/:id", async (req, res) => {
   try {
-    const taskId = req.params.id;
-    const updatedText = req.body.text;
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.json({ message: "Task not found" });
-    }
-    task.set({ text: updatedText });
-    const updatedTask = await task.save();
-    res.json(updatedTask);
+    const updatedItem = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.json(updatedItem);
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -42,12 +35,8 @@ router.put("/tasks/:id", async (req, res) => {
 
 router.delete("/tasks/:id", async (req, res) => {
   try {
-    const taskId = req.params.id;
-    const result = await Task.deleteOne({ _id: taskId });
-    if (result.deletedCount === 0) {
-      return res.json({ message: "Task not found" });
-    }
-    res.json({ message: "Task deleted" });
+    await Task.findByIdAndRemove(req.params.id);
+    res.json({ msg: "Item removed" });
   } catch (err) {
     console.error(err);
     res.json({ message: "Something went wrong" });
